@@ -1,4 +1,5 @@
 import pygame
+from pygame.locals import *
 
 class memoryGame:
   SCREEN_WIDTH = 900
@@ -7,9 +8,12 @@ class memoryGame:
   GAME = pygame.init()
   RUNNING = True
   BACKGROUND_COLOR = (255, 255, 255)
+  APP_NAME = "Memory.Py"
 
   def setDefaultConfigs(self):
     self.SCREEN.fill(self.BACKGROUND_COLOR)
+    pygame.display.update()
+    pygame.display.set_caption(self.APP_NAME)
     self.initGame()
 
   def initGame(self): 
@@ -24,3 +28,4 @@ class memoryGame:
 
 newGame = memoryGame()
 newGame.setDefaultConfigs()
+
