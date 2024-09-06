@@ -1,26 +1,27 @@
 import pygame
 
 class memoryGame:
-  SCREEN_WIDTH = 900
-  SCREEN_HEIGHT = 900
-  SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-  GAME = pygame.init()
-  RUNNING = True
-  BACKGROUND_COLOR = (255, 255, 255)
+  def __init__(self):
+    self.screen_width = 900
+    self.screen_height = 900
+    self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+    self.running = True
+    self.background_color = (255, 255, 255)
 
   def setDefaultConfigs(self):
-    self.SCREEN.fill(self.BACKGROUND_COLOR)
+    self.screen.fill(self.background_color)
     self.initGame()
 
   def initGame(self): 
-    while self.RUNNING:
+    while self.running:
       for event in pygame.event.get():
         self.verifyIfCloseGame(event)
-        print(event)
   
   def verifyIfCloseGame(self, event):
     if event.type == pygame.QUIT:
-      self.RUNNING = False
+      self.running = False
 
-newGame = memoryGame()
-newGame.setDefaultConfigs()
+
+if __name__ == "__main__":
+  newGame = memoryGame()
+  newGame.setDefaultConfigs()
