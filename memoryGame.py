@@ -20,19 +20,19 @@ class memoryGame():
     while self.RUNNING:
       for event in pygame.event.get():
         self.verifyIfCloseGame(event)
-        self._draw_menu()
+        self.draw_menu()
         print(event)
   
   def verifyIfCloseGame(self, event):
     if event.type == pygame.QUIT:
       self.RUNNING = False
 
-  def _draw_menu(self):
-    memoryGame.SCREEN.fill(memoryGame.BACKGROUND_COLOR)
-    self.title= memoryGame.FONT.render("Bem vindo ao Memory.py", True, memoryGame.FONTS_COLOR)
-    self.start=memoryGame.FONT.render("Click em [E]nter para começar.", True, memoryGame.FONTS_COLOR)
-    memoryGame.SCREEN.blit(self.title,(memoryGame.SCREEN_WIDTH//2 - self.title.get_width()// 2, memoryGame.SCREEN_HEIGHT//4))
-    memoryGame.SCREEN.blit(self.start,(memoryGame.SCREEN_WIDTH//2 - self.start.get_width()// 2,memoryGame.SCREEN_HEIGHT//2))
+  def draw_menu(self):
+    self.SCREEN.fill(self.BACKGROUND_COLOR)
+    self.title= self.FONT.render("Bem vindo ao Memory.py", True, self.FONTS_COLOR)
+    self.start=self.FONT.render("Click em [E]nter para começar.", True, self.FONTS_COLOR)
+    self.SCREEN.blit(self.title,(self.SCREEN_WIDTH//2 - self.title.get_width()// 2, self.SCREEN_HEIGHT//4))
+    self.SCREEN.blit(self.start,(self.SCREEN_WIDTH//2 - self.start.get_width()// 2,self.SCREEN_HEIGHT//2))
     pygame.display.flip()
 
 
