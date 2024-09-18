@@ -9,6 +9,9 @@ class memoryGame:
   RUNNING = True
   BACKGROUND_COLOR = (255, 255, 255)
   APP_NAME = "Memory.Py"
+  BALL = pygame.image.load("assets/ball.gif")
+  WIDTH_BALL = 640
+  HEIGHT_BALL = 320
 
   def setDefaultConfigs(self):
     self.SCREEN.fill(self.BACKGROUND_COLOR)
@@ -20,7 +23,17 @@ class memoryGame:
     while self.RUNNING:
       for event in pygame.event.get():
         self.verifyIfCloseGame(event)
-        print(event)
+        rect = self.BALL.get_rect()
+        speed = [2, 2]
+        rect = rect.move(speed)
+        if rect.left < 0 or rect.right > self.WIDTH_BALL:
+          speed[0] = -speed[0]
+        if rect.top < 0 or rect.bottom > self.HEIGHT_BALL:
+          speed[1] = -speed[1]
+
+        pygame.draw.rect(self.SCREEN, (255, 0, 0), rect, 1)
+        self.SCREEN.blit(self.BALL, rect)
+        pygame.display.update()
   
   def verifyIfCloseGame(self, event):
     if event.type == pygame.QUIT:
