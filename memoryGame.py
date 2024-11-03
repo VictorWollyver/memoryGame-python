@@ -52,32 +52,38 @@ class Jogador:
         self.pattern.append(button_index)
 
 class Controlador:
-    def __init__(self):
+    def __init__(self, initial_difficulty=4):
         button_size = 50
         spacing = 20
         num_buttons_per_row = 3
         num_rows = 3
-        padding = 20  # Espaçamento entre a borda da caixa e os botões
+        padding = 20
 
         # Calcula a largura e altura total ocupada pelos botões e espaçamentos
         total_height = num_rows * button_size + (num_rows - 1) * spacing
         total_width = num_buttons_per_row * button_size + (num_buttons_per_row - 1) * spacing
-        start_y = (screen_height - total_height) // 4  # Centraliza verticalmente
-        start_x = (screen_width - total_width) // 2  # Centraliza horizontalmente
+        start_y = (screen_height - total_height) // 4
+        start_x = (screen_width - total_width) // 2
 
         # Define a caixa ao redor dos botões com padding
         self.box_rect = pygame.Rect(start_x - padding, start_y - padding, total_width + 2 * padding, total_height + 2 * padding)
         self.player_box_rect = pygame.Rect(start_x - padding, start_y + 300 - padding, total_width + 2 * padding, total_height + 2 * padding)
 
-        # Ajusta a posição dos botões para incluir o padding
-        self.buttons = [Botao(start_x + (i % num_buttons_per_row) * (button_size + spacing), start_y + (i // num_buttons_per_row) * (button_size + spacing), button_size, button_size, "", background_color) for i in range(9)]
-        self.player_buttons = [Botao(start_x + (i % num_buttons_per_row) * (button_size + spacing), start_y + (i // num_buttons_per_row) * (button_size + spacing) + 300, button_size, button_size, "", background_color) for i in range(9)]
+        self.buttons = [Botao(start_x + (i % num_buttons_per_row) * (button_size + spacing),
+                              start_y + (i // num_buttons_per_row) * (button_size + spacing),
+                              button_size, button_size, "", background_color) for i in range(9)]
+        self.player_buttons = [Botao(start_x + (i % num_buttons_per_row) * (button_size + spacing),
+                                     start_y + (i // num_buttons_per_row) * (button_size + spacing) + 300,
+                                     button_size, button_size, "", background_color) for i in range(9)]
+
+        self.initial_difficulty = initial_difficulty
+        self.current_difficulty = initial_difficulty  # Define o comprimento da sequência inicial
         self.pattern = []
         self.player = Jogador()
         self.showing_pattern = True
 
     def draw_box(self, rect):
-        pygame.draw.rect(screen, black, rect, 3, border_radius=12)  # Desenha a caixa com uma borda de 3 pixels e raio de borda de 12
+        pygame.draw.rect(screen, black, rect, 3, border_radius=12)
 
     def draw_buttons(self):
         self.draw_box(self.box_rect)
@@ -106,20 +112,26 @@ class Controlador:
     def check_player_input(self, button_index):
         self.player.add_input(button_index)
         if self.player.pattern == self.pattern:
-            self.player.score += 10  # Aumenta a pontuação ao vencer
-            return True  # Jogador venceu
+            self.player.score += 10
+            self.increase_difficulty()  # Aumenta a dificuldade após sequência correta
+            return True
         elif len(self.player.pattern) == len(self.pattern):
-            return False  # Jogador perdeu
-        return None  # Continua jogando
+            return False
+        return None
 
     def start_game(self):
-        self.pattern = [random.randint(0, 8) for _ in range(4)]
+        self.pattern = [random.randint(0, 8) for _ in range(self.current_difficulty)]
         self.player.reset()
         self.showing_pattern = True
+
+    def increase_difficulty(self):
+        self.current_difficulty += 1
+        self.start_game()
 
 class Menu:
     current_score = 0
     high_score = 0
+
     def __init__(self):
         self.buttons = [
             Botao(200, 400, 200, 50, "Iniciar", green),
@@ -131,9 +143,9 @@ class Menu:
             Botao(200, 200, 200, 50, "Fácil", blue),
             Botao(200, 270, 200, 50, "Médio", blue),
             Botao(200, 340, 200, 50, "Difícil", blue),
-            Botao(200, 410, 200, 50, "Voltar", yellow)  # Botão de voltar
+            Botao(200, 410, 200, 50, "Voltar", yellow)
         ]
-        self.controlador = Controlador()
+        self.controlador = Controlador(initial_difficulty=4)
         self.high_score = self.load_high_score()
 
     def load_high_score(self):
@@ -148,47 +160,40 @@ class Menu:
 
     def draw(self):
         screen.fill(background_color)
-        
+
         # Carrega a imagem PNG
         png_file_path = "Group 1.png"
         png_image = pygame.image.load(png_file_path)
 
-        # Calcula a posição para desenhar a imagem abaixo do texto
         font = pygame.font.Font(font_file_path, 36)
-        fontPontuacao = pygame.font.Font(font_file_path, 24)
         score_surface = font.render(f"Memory.Py", True, white)
-        margin_bottom = 40
         text_x = screen_width // 2 - score_surface.get_width() // 2
-        text_y = 150 - margin_bottom
+        text_y = 110
         image_x = screen_width // 2 - png_image.get_width() // 2
-        image_y = text_y + score_surface.get_height() + 60  # 10 pixels de margem inferior
+        image_y = text_y + score_surface.get_height() + 60
 
-        # Desenha a imagem PNG
         screen.blit(png_image, (image_x, image_y))
-
-        # Desenha o texto
         screen.blit(score_surface, (text_x, text_y))
 
-        # Desenha os botões
         for button in self.buttons:
             button.draw()
 
         fontPontuacao = pygame.font.Font(font_file_path, 24)
-        high_score_text = "Melhor pontuação:"
-        high_score_value = str(self.high_score)
-
-        high_score_text_surface = fontPontuacao.render(high_score_text, True, white)
-        high_score_text_x = 10  # Margem esquerda
-        high_score_text_y = screen_height - high_score_text_surface.get_height() - 10  # Margem inferior
-
-        high_score_value_surface = fontPontuacao.render(high_score_value, True, (0, 255, 0))  # Verde
-        high_score_value_x = high_score_text_x + high_score_text_surface.get_width() + 5  # Adiciona um pequeno espaçamento
-        high_score_value_y = high_score_text_y
-
-        screen.blit(high_score_text_surface, (high_score_text_x, high_score_text_y))
-        screen.blit(high_score_value_surface, (high_score_value_x, high_score_value_y))
+        high_score_text_surface = fontPontuacao.render("Melhor pontuação:", True, white)
+        high_score_value_surface = fontPontuacao.render(str(self.high_score), True, (0, 255, 0))
+        screen.blit(high_score_text_surface, (10, screen_height - high_score_text_surface.get_height() - 10))
+        screen.blit(high_score_value_surface, (10 + high_score_text_surface.get_width() + 5, screen_height - high_score_text_surface.get_height() - 10))
 
         pygame.display.flip()
+
+    def modify_difficulty(self, difficulty_level):
+        if difficulty_level == "Fácil":
+            self.controlador.initial_difficulty = 3
+        elif difficulty_level == "Médio":
+            self.controlador.initial_difficulty = 4
+        elif difficulty_level == "Difícil":
+            self.controlador.initial_difficulty = 5
+        self.controlador.current_difficulty = self.controlador.initial_difficulty
 
     def draw_difficulty_menu(self):
         screen.fill(background_color)
@@ -202,15 +207,16 @@ class Menu:
     def check_clicks(self, pos):
         for i, button in enumerate(self.buttons):
             if button.rect.collidepoint(pos):
-                if i == 0:  # Iniciar a partida
+                if i == 0:
                     self.controlador.start_game()
                     return "start_game"
-                elif i == 1:  # Modificar Dificuldade
+                elif i == 1:
                     return "difficulty_menu"
-                elif i == 2:  # Como Jogar
+                elif i == 2:
                     return "how_to_play"
-                elif i == 3:  # Sair
+                elif i == 3:
                     return "exit"
+
 
     def modify_difficulty(self):
         self.display_message("Dificuldade modificada!")
